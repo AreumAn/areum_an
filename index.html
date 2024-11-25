@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Areum An</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+
+    <div class="section-wrapper">
+      <div class="content-wrapper id-card-wrapper">
+        <div class="id-card">
+          <div class="photo">
+              <img src="areum_an.PNG" alt="Profile Photo">
+          </div>
+          <div class="identity">
+              <div class="name">Areum An</div>
+              <div class="job">Software Engineer</div>
+              <div class="location">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Toronto, ON</span>
+            </div>
+              <div class="links">
+                  <a href="https://www.linkedin.com/in/areum-an" target="_blank">
+                      <i class="fab fa-linkedin"></i>
+                  </a>
+                  <a href="https://github.com/AreumAn" target="_blank">
+                      <i class="fab fa-github"></i>
+                  </a>
+                  <a href="mailto:areum.an.0928@gmail.com"><i class="fas fa-envelope"></i></a>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-wrapper ">
+        <div class="list-card skill">
+          <h2>💪🏻 Skill Set</h2>
+          <ul class="skill-list">
+            <li class="skill-item">
+              <span>🎨 Front-end: </span>
+              <span class="skill-text">Javascript, React, Next.js, Typescript , Redux, jQuery, HTML5, CSS, Bootstrap, Styled Components, tailwind css, Material-UI</span>
+            </li>
+            <li class="skill-item">
+              <span>🖥️ Back-end:</span>
+              <span class="skill-text">Python, Frappe framework, PHP, Codeigniter, Node.js, MySQL,Oracle, RESTful API, NoSQL</span>
+            </li>
+            <li class="skill-item">
+              <span>🛠️ Misc:</span>
+              <span class="skill-text">Cypress, AWS, Crowdin, Stripe, Docker, Netlify, Github, Bitbucket, STS, Eclipse,gatsbyJS, WordPress, Hugo, AgilityCMS</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="section-wrapper">
+      <div class="warning">
+        <span>This work history is not friendly for mobile users. Please use desktop to play the game to see work history!</span>
+      </div>
+      <div class="content-wrapper">
+        <div class="game-container">
+              <div class="cloud cloud1">☁️</div>
+              <div class="cloud cloud2">☁️</div>
+              <div class="cloud cloud3">☁️</div>
+              
+              <div id="character">
+                  <div class="speech-bubble hidden">
+                      <span class="achievement-text"></span>
+                  </div>
+                  <div class="pixel-character">
+                      <div class="hat"></div>
+                      <div class="hair"></div>
+                      <div class="head"></div>
+                      <div class="face"></div>
+                      <div class="eyes"></div>
+                      <div class="body"></div>
+                      <div class="legs"></div>
+                  </div>
+              </div>
+              <div class="hurdles"></div>
+              <div class="ground"></div>
+              <div class="space-to-jump hidden">Space to Jump</div>
+  
+              <div class="menu-container">
+                  <div class="message hidden"></div>
+                  <div class="button-container">
+                      <button id="playBtn"></button>
+                      <button id="watchBtn"></button>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="content-wrapper">
+          <div class="list-card achievements">
+            <div class="title-wrapper">
+              <h2>👩🏻‍💻 Work History</h2>
+              <a href="https://www.linkedin.com/in/areum-an" target="_blank" class="view-details">
+                <span>View Details</span>
+                <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+            <ul id="achievement-list"></ul>
+          </div>
+        </div>
+    </div>
+
+  </div>
+    <script src="script.js"></script>
+</body>
+</html> 
