@@ -1,16 +1,22 @@
-let character = document.getElementById('character');
-let gameContainer = document.querySelector('.game-container');
-let playBtn = document.getElementById('playBtn');
-let watchBtn = document.getElementById('watchBtn');
-let achievementList = document.getElementById('achievement-list');
+const characterEl = document.getElementById('character');
+const gameContainerEl = document.querySelector('.game-container');
+const playBtnEl = document.getElementById('playBtn');
+const watchBtnEl = document.getElementById('watchBtn');
+const achievementListEl = document.getElementById('achievement-list');
+const speechBubbleEl = document.querySelector('.speech-bubble');
+const achievementTextEl = document.querySelector('.achievement-text');
+const messageEl = document.querySelector('.message');
+const buttonContainerEl = document.querySelector('.button-container');
+const spaceToJumpEl = document.querySelector('.space-to-jump');
+
 let isPlaying = false;
 let isAutoMode = false;
 let currentHurdle = 0;
 let lastMode = null;
-
 let audioContext;
+let activeTimers = [];
 
-const jobs = [
+const careerHistory = [
   {
     "company": "OpenTide Korea",
     "title": "Web Developer",
@@ -55,104 +61,92 @@ const jobs = [
   }
 ];
 
-function createJumpSound() {
+function initAudioContext() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
-    
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1);
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
+    return audioContext;
 }
 
-function createAchievementSound() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+function playSound(type) {
+    const ctx = initAudioContext();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
     
     oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    gainNode.connect(ctx.destination);
     
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.15);
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.15);
+    if (type === 'jump') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(600, ctx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.1);
+    } else if (type === 'achievement') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, ctx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.15);
+        
+        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.15);
+    }
 }
 
 function jump() {
-    const character = document.getElementById('character');
-    if (!character.classList.contains('jump')) {
-        character.classList.add('jump');
+    if (!characterEl.classList.contains('jump')) {
+        characterEl.classList.add('jump');
         setTimeout(() => {
-            character.classList.remove('jump');
+            characterEl.classList.remove('jump');
         }, 500);
     }
 }
 
 function showMenu(type) {
-    const messageEl = document.querySelector('.message');
-    const buttonContainer = document.querySelector('.button-container');
-    const playBtn = document.getElementById('playBtn');
-    const watchBtn = document.getElementById('watchBtn');
-
     messageEl.classList.remove('hidden');
-    buttonContainer.classList.remove('hidden');
+    buttonContainerEl.classList.remove('hidden');
 
     switch(type) {
         case 'gameOver':
             messageEl.textContent = 'Try Again!';
-            playBtn.textContent = 'Play Again';
-            watchBtn.textContent = 'Watch';
+            playBtnEl.textContent = 'Play Again';
+            watchBtnEl.textContent = 'Watch';
             break;
         case 'gameSuccess':
             messageEl.textContent = 'Congratulations🎉! You completed all challenges!';
-            playBtn.textContent = 'Play Again';
-            watchBtn.textContent = 'Watch';
+            playBtnEl.textContent = 'Play Again';
+            watchBtnEl.textContent = 'Watch';
             break;
         case 'watchComplete':
             messageEl.textContent = 'You have seen all achievements!';
-            playBtn.textContent = 'Play';
-            watchBtn.textContent = 'Watch Again';
+            playBtnEl.textContent = 'Play';
+            watchBtnEl.textContent = 'Watch Again';
             break;
         default:
             messageEl.classList.add('hidden');
-            playBtn.textContent = 'Play';
-            watchBtn.textContent = 'Watch';
+            playBtnEl.textContent = 'Play';
+            watchBtnEl.textContent = 'Watch';
     }
 }
 
 function hideMenu() {
-    document.querySelector('.message').classList.add('hidden');
-    document.querySelector('.button-container').classList.add('hidden');
+    messageEl.classList.add('hidden');
+    buttonContainerEl.classList.add('hidden');
 }
 
 function createHurdle() {
-    if (currentHurdle >= jobs.length || !isPlaying) return;
+    if (currentHurdle >= careerHistory.length || !isPlaying) return;
     
     const hurdle = document.createElement('div');
     hurdle.className = 'hurdle';
     hurdle.style.left = '800px';
-    document.querySelector('.game-container').appendChild(hurdle);
+    gameContainerEl.appendChild(hurdle);
 
     let position = 800;
     let hurdlePassed = false;
@@ -164,7 +158,7 @@ function createHurdle() {
             return;
         }
 
-        const speed = isAutoMode ? 2 : 2;
+        const speed = 2;
         position -= speed;
         hurdle.style.left = position + 'px';
 
@@ -173,7 +167,7 @@ function createHurdle() {
         }
 
         if (position >= 230 && position <= 270) {
-            const characterBottom = parseInt(window.getComputedStyle(document.getElementById('character')).getPropertyValue('bottom'));
+            const characterBottom = parseInt(window.getComputedStyle(characterEl).getPropertyValue('bottom'));
 
             if (characterBottom < 120 && !isAutoMode) {
                 clearInterval(moveHurdle);
@@ -183,15 +177,16 @@ function createHurdle() {
             
             if (!hurdlePassed && position <= 250) {
                 hurdlePassed = true;
-                addJob(jobs[currentHurdle]);
+                addCareerAchievement(careerHistory[currentHurdle]);
                 currentHurdle++;
                 
-                if (currentHurdle >= jobs.length) {
+                if (currentHurdle >= careerHistory.length) {
                     setTimeout(() => {
                         endGame('success');
                     }, 500);
                 } else {
-                    setTimeout(createHurdle, 2000);
+                    const nextHurdleTimer = setTimeout(createHurdle, 2000);
+                    activeTimers.push(nextHurdleTimer);
                 }
             }
         }
@@ -201,58 +196,71 @@ function createHurdle() {
             hurdle.remove();
         }
     }, 10);
+    
+    activeTimers.push(moveHurdle);
 }
 
-function addJob(job) {
-    const isCurrent = job.isCurrent ? '🔥' : '✅ ';
+function addCareerAchievement(career) {
+    const statusIcon = career.isCurrent ? '🔥' : '✅ ';
     const li = document.createElement('li');
     li.className = 'achievement-item';
-    li.innerHTML = `${isCurrent} ${job.company} - ${job.title}<br>⏰ ${job.duration}`;
+    li.innerHTML = `${statusIcon} ${career.company} - ${career.title}<br>⏰ ${career.duration}`;
     
-    achievementList.insertBefore(li, achievementList.firstChild);
+    achievementListEl.insertBefore(li, achievementListEl.firstChild);
     
-    createAchievementSound();
+    playSound('achievement');
 
-    const speechBubble = document.querySelector('.speech-bubble');
-    const achievementText = document.querySelector('.achievement-text');
-    achievementText.textContent = `${job.location} ${job.company}`;
-    speechBubble.classList.remove('hidden');
+    achievementTextEl.textContent = `${career.location} ${career.company}`;
+    speechBubbleEl.classList.remove('hidden');
     
     setTimeout(() => {
-        speechBubble.classList.add('hidden');
+        speechBubbleEl.classList.add('hidden');
     }, 3000);
+}
+
+function clearAllTimers() {
+    // Remove all active timers
+    activeTimers.forEach(timer => clearTimeout(timer));
+    activeTimers = [];
+}
+
+function clearAllHurdles() {
+    // Remove all hurdles
+    const hurdles = document.querySelectorAll('.hurdle');
+    hurdles.forEach(hurdle => hurdle.remove());
 }
 
 function startGame(mode) {
     if (isPlaying) return;
     
+    // Clean up previous game state
+    clearAllTimers();
+    clearAllHurdles();
+    
     lastMode = mode;
     isAutoMode = mode === 'watch';
     isPlaying = true;
     currentHurdle = 0;
-    achievementList.innerHTML = '';
+    achievementListEl.innerHTML = '';
     
     hideMenu();
-    
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    
-    const hurdles = document.querySelectorAll('.hurdle');
-    hurdles.forEach(hurdle => hurdle.remove());
+    initAudioContext();
     
     if (!isAutoMode) {
-        document.querySelector('.space-to-jump').classList.remove('hidden');
+        spaceToJumpEl.classList.remove('hidden');
     }
     
-    setTimeout(createHurdle, 1000);
+    const initialTimer = setTimeout(createHurdle, 1000);
+    activeTimers.push(initialTimer);
 }
 
 function endGame(type = 'gameOver') {
     isPlaying = false;
     isAutoMode = false;
     
-    document.querySelector('.space-to-jump').classList.add('hidden');
+    clearAllTimers();
+    
+    spaceToJumpEl.classList.add('hidden');
     
     if (type === 'gameOver' && lastMode === 'play') {
         showMenu('gameOver');
@@ -270,7 +278,8 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-playBtn.addEventListener('click', () => startGame('play'));
-watchBtn.addEventListener('click', () => startGame('watch'));
+playBtnEl.addEventListener('click', () => startGame('play'));
+watchBtnEl.addEventListener('click', () => startGame('watch'));
 
 showMenu();
+
